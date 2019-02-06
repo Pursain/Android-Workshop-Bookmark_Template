@@ -11,6 +11,7 @@ For the Complete Code: https://github.com/Pursain/Bookmark_Complete
 5. **Hardcoding is bad...** (Dynamically populating the listView)
 6. **Let's launch a link!** (Setting OnClickListeners to launch links with Uri and intents) 
 7. **Try adding an item and rotating the screen** (Digging deeper into the activity lifecycle and saving information in the bundle)
+8. **Debugging with Android** (Toasts and Logging)
 
 ## 1. Exploring Android and the Android Studio IDE
 
@@ -307,3 +308,23 @@ By adding this code, we can modify our onCreate(Bundle savedInstanceState) metho
 The image on the left did not save the ArrayList into the bundle before it onStop() was called. The image on the right does and has code to get that information whenever onCreate() is called thus the persistence of the Youtube link:
 
 <img src='https://github.com/Pursain/Bookmark_Complete/blob/master/github_media/with_bundleSave.gif' title="TODO 1" width='49%'/> <img src='https://github.com/Pursain/Bookmark_Complete/blob/master/github_media/without_bundleSave.gif' title="TODO 1" width='49%'/>
+
+## 8. Debugging with Android (Toasts and Logging)
+
+"print statements > debugger", change my mind
+
+Android has a built in debugger and it works quite nicely if you know what you're doing, albiet not very beginner friendly, theres just too much information to digest if you don't know what you're looking for. Our alternative is our good ole friend the print statement, easy and convenient; Java's equivalent is System.out.println(). OOF! Wait, where is Android's console? 
+
+Android has a what is called the Logcat which is essentially Android's way of logging everything that is happening and when I say everything, I mean EVERYTHING. Try opening up the logcat when your app is running, it's located on the bottom bar by default. To filter out all the shanigans that we don't care about, what you want to do is on the top right of the logcat window, click the filter dropdown and select "show only selected application" which will show only log messages in the app your running. 
+
+How do I write a log in my application? By default, the logging should look like this:
+    
+    Log.d("Your current Class", "Your current function: you message here ");
+
+There are other logs types, feel free to look at those, we chose Log.d which stands for debugging. When your application reaches that line in your code, it will print this into the logcat and its a pretty good debugging tool to see what's happening. Feel free to litter your code with these logs, the more the merrier :)
+
+Toasts are another feature android has that is useful both as an indicator to the user of what is happening and also as a hacky visual print statement for you as well. Unlike the log statement, the toast will appear on top of the screen whenever you call it. 
+
+    Toast.makeText(this, "Your message here", Toast.LENGTH_SHORT).show();
+    
+If you look closely at my gifs above when I click an entry and launch the link, you can see me using a Toast message to notify the user that the entry was added. 
