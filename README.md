@@ -3,6 +3,12 @@ This is the Template code for the Intro to Android Development for HackUCI 2019
 
 For the Complete Code: https://github.com/Pursain/Bookmark_Complete
 
+If you haven't already, please download Android Studio: https://developer.android.com/studio/
+
+Once Android Studio is installed, make sure to set up AVD (Android Virtual Device): https://developer.android.com/studio/run/managing-avds
+
+Before the workshop begins, download the Bookmark_Template from github and open up the project through Android Studio. Have the AVD running in the background as well.
+
 # Table Of Contents
 1. **Exploring Android and the Android Studio IDE**
 2. **Let's click for Zots** (Changing text with a button onClick)
@@ -14,8 +20,6 @@ For the Complete Code: https://github.com/Pursain/Bookmark_Complete
 8. **Debugging with Android** (Toasts and Logging)
 
 ## 1. Exploring Android and the Android Studio IDE
-
-***TODO revise this section***
 
 ### Some Android Vocabulary
 
@@ -49,9 +53,9 @@ a button that you can click that makes the Zots. To me, that sounds like I need 
 It's easiest to edit the XML file using Android Studio's design interface, its pretty intuitive with the drag and drop interface. 
 
 For the sake of coherency, name your view objects as the following:
- - textView_splashQuestion for the TextView that says "What do Anteaters say?"
- - textView_splashAnswer for the TextView that will contain our Zots
- - button_splashGetAnswer for the Button that says "Click to find out!"
+ - **textView_splashQuestion** for the TextView that says "What do Anteaters say?"
+ - **textView_splashAnswer** for the TextView that will contain our Zots
+ - **button_splashGetAnswer** for the Button that says "Click to find out!"
 
 Below is the text solution to the XML needed to make those 3 elements. Looks really wordy right? The built-in design tool in Android Studio astracts it so you won't have to worry about every minute detail but it is good to know that this is the actual xml text that is used to draw your apps. 
 
@@ -97,8 +101,12 @@ Below is the text solution to the XML needed to make those 3 elements. Looks rea
 ### Task 2: modify the onClick_findAnswer function to add zots to the textView 
 
 How are we going to change the text of a TextView? Well, there are two functions in the TextView class that we will use to change the text of the TextView: 
- - someTextView.getText().toString() will return the String inside the textView 
- - someTextView.setText("Hello World") will set the text of the textView to the String
+
+    //will return the String inside the textView 
+    String someString = someTextView.getText().toString() 
+    
+    //will set the Hello World of the textView to the String
+    someTextView.setText("Hello World") 
 
 Heres what the Puesdocode looks like if you wanted to append text to a TextView:
  - get the String from the textView and store it into a String variable 
@@ -108,7 +116,7 @@ Heres what the Puesdocode looks like if you wanted to append text to a TextView:
 Implementing the Puesdocode in our application will look like this:
 
     public void onClick_findAnswer(View view){
-      currentText = textView_splashAnswer.getText().toString();
+      String currentText = textView_splashAnswer.getText().toString();
       currentText += "Zot ";
       textView_splashAnswer.setText(currentText);
     }
@@ -231,6 +239,7 @@ Here is a possible implementation:
         String URL = editText_URL.getText().toString();
         
         //a little bit of validation
+        //rejects if atleast one of the editTexts are empty
         if (!title.equals("") && !URL.equals("")) {
             arrayAdapter_bookmark.add(title + "\n" + URL);
         }
@@ -238,7 +247,6 @@ Here is a possible implementation:
         editText_title.setText("");
         editText_URL.setText("");
     }
-
 
 ## 6. Let's launch a link! (Setting OnClickListeners to launch links with Uri and intent) 
 
@@ -255,6 +263,7 @@ There are 3 things that needs to be done here:
  
 First things first, we need to add an OnClickListener to our ListView, it'll look like this:
 
+    //typically done like this
     listView_bookmark.setOnItemClickListener(new AdapterView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -262,7 +271,16 @@ First things first, we need to add an OnClickListener to our ListView, it'll loo
         }
     });
     
-This code looks a bit daunting but what it's doing is creating a new object called AdapterView.OnItemClickListener and setting that as the object we want to use for our ListView. The AdapterView.OnItemClickListener requires you to define the onItemClick() method. That onItemClick() method will be called whenever the user clicks on an entry in the ListView. The position parameter tells us which one the user clicked on which will be useful to us. 
+    //More spanned out
+    AdapterView.OnItemClickListener someListener = new AdapterView.OnItemClickListener() {
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            //this method is called when an item on the listView is clicked
+        }
+    }
+    listView_bookmark.setOnItemClickListener(someListener);
+    
+This code looks a bit daunting but what it's doing is creating a new object called AdapterView.OnItemClickListener and setting that as the object we want to use for our ListView. The AdapterView.OnItemClickListener is abstract so it requires you to define the onItemClick() method. That onItemClick() method will be called whenever the user clicks on an entry in the ListView. The position parameter tells us which item in the list the user clicked on which will be useful to us. 
 
 The second part is to parse the entry into just a link, this part is purely java, if it doesn't make sense, don't fret, just believe it works:
 
@@ -275,7 +293,25 @@ The last part is to create the intent with the link. In the past, we've used int
     //starts the intent, does not check for validity tho :/
     startActivity(intentToOpenLink);
     
-Intent.ACTION_VIEW tells android to find the most reasonable way to handle the information at hand. The .setData() is used here to put the link data into the intent but before that, it must be formatted by the Uri with Uri.parse() to ensure the link is formatted properly. The last line is to start the intent. There are more intricacies at play here but its beyond the scope of this workshop. That's why Android is so cool, there's always more to know :)
+Intent.ACTION_VIEW tells android to find the most reasonable way to handle the information at hand and then show us in a view. The .setData() is used here to put the link data into the intent but before that, it must be formatted by the Uri with Uri.parse() to ensure the link is formatted properly. The last line is to start the intent. There are more intricacies at play here but its beyond the scope of this workshop. That's why Android is so cool, there's always more to know :)
+
+The completed code should look like this:
+   
+    listView_bookmark.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            
+                //parse the item text by its name and url
+                String link = arrayAdapter_bookmark.getItem(position).split("\n")[1];
+
+                //converts the URL String into an URI so the intent can use it
+                Intent intentToOpenLink = new Intent(Intent.ACTION_VIEW);
+                intentToOpenLink.setData(Uri.parse(link));
+
+                //starts the intent, does not check for validity tho :/
+                startActivity(intentToOpenLink);
+            }
+        });
 
 ## 7. Try adding an item and rotating the screen (Digging deeper into the activity lifecycle and saving information in the bundle)
 
